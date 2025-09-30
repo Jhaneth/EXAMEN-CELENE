@@ -1,0 +1,96 @@
+body{
+    background: #D6DAC8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+/* Login form */
+.login-form {
+    background-color: #FBF3D5;
+    background-size: cover;
+    padding: 20px;
+    text-align: center;
+    color: #9CAFAA;
+        /* Color del texto */
+    max-width: 300px;
+        /* Ancho máximo del contenedor */
+    border-radius: 10px;
+        /* Bordes redondeados */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        /* Sombra */
+
+}
+
+.login-form h1 {
+    text-align: center;
+    color: #9CAFAA;
+    font-size: 28px;
+    padding: 70px 0 10px 0;
+}
+
+.login-form input[type="password"],
+.login-form input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ced4da;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+/* Estilos boton Acceder*/
+.btn-login {
+    background-color: #9CAFAA;
+    width: 100%;
+    border: none;
+    color: #FBF3D5;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+}
+
+.btn-login:hover,
+.btn-login:active {
+    background-color: #D6A99D;
+    color: white;
+    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+.btn-login:focus {
+    
+    box-shadow: 0 0 0 3px rgba(121, 82, 179, 0.25)
+}
+/* Estilos boton REGISTER*/
+.btn-register {
+    width: 100%;
+    padding: 15px;
+    background-color: #D6A99D;
+    border: 0;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: large;
+    color: #FBF3D5;
+    margin-top: 20px;
+    /* Para dar la apariencia de un boton */
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-register:hover,
+.btn-register:active {
+    background-color: #9CAFAA;
+    color: #fff;
+    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+.btn-register:focus {
+    box-shadow: 0 0 0 3px rgba(121, 82, 179, 0.25)
+}
+

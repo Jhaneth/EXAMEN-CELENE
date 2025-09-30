@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <title>D | <%= proyecto.name %>
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="resources/css/logoFICCT.jpg" type="image/x-icon">
+  <!-- Iconos de Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#9CAFAA',
+            secondary: '#D6A99D',
+            accent: '#D6DAC8',
+            'dark-bg': '#FBF3D5',
+            'dark-surface': '#D6DAC8',
+            'text-light': '#333333',
+            'text-gray': '#555555',
+            danger: '#ef4444',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/resources/css/style2.css">
+</head>
+
+<body class="bg-dark-bg text-text-light min-h-screen">
+  <!-- Barra de Herramientas Principal -->
+  <div
+    class="w-full p-4 md:px-8 bg-dark-surface shadow-lg flex flex-col md:flex-row items-center justify-between rounded-b-xl border-b-2 border-primary">
+    <div class="flex flex-wrap justify-center md:justify-start items-center gap-4 mb-4 md:mb-0">
+      <h1 class="text-xl md:text-2xl font-bold text-text-light mb-2 md:mb-0" id="project-title">Diagrama | <%=
+          proyecto.name %>
+      </h1>
+      <button class="tool-button px-4 py-2 bg-primary rounded-full hover:bg-secondary transition duration-300 active"
+        id="tool-select" title="Select/Move">
+        <i class="fas fa-mouse-pointer mr-1"></i> <span class="hidden md:inline">Select</span>
+      </button>
+      <button class="tool-button px-4 py-2 bg-primary rounded-full hover:bg-secondary transition duration-300"
+        id="tool-class" title="Add Class">
+        <i class="fas fa-cube mr-1"></i> <span class="hidden md:inline">Clase</span>
+      </button>
+      <button class="tool-button px-4 py-2 bg-primary rounded-full hover:bg-secondary transition duration-300"
+        id="tool-one_to_many" title="one_to_many">
+        <span class="hidden md:inline">1:N</span>
+      </button>
+      <button class="tool-button px-4 py-2 bg-primary rounded-full hover:bg-secondary transition duration-300"
+        id="tool-one_to_one" title="one_to_one">
+        <span class="hidden md:inline">1:1</span>
+      </button>
+      <button class="tool-button px-4 py-2 bg-primary rounded-full hover:bg-secondary transition duration-300"
+        id="tool-many_to_many" title="many_to_many">
+        <span class="hidden md:inline">N:N</span>
+      </button>
+      <button class="tool-button px-4 py-2 bg-primary rounded-full hover:bg-secondary transition duration-300"
+        id="tool-many_to_one" title="many_to_one">
+        <span class="hidden md:inline">N:1</span>
+      </button>
+      <button class="tool-button px-4 py-2 bg-danger rounded-full hover:bg-red-600 transition duration-300"
+        id="tool-delete" title="Delete">
+        <i class="fas fa-eraser mr-1"></i> <span class="hidden md:inline">Borrar</span>
+      </button>
+    </div>
+
+    <div class="flex flex-wrap justify-center md:justify-end items-center gap-4">
+      <button id="zoom-out-btn" title="Zoom Out" class="px-4 py-2 bg-accent text-white rounded-full hover:bg-emerald-600 transition duration-300 shadow-lg">
+        <i class="fas fa-search-minus"></i>
+      </button>
+      <button id="zoom-reset-btn" title="Reset Zoom" class="px-4 py-2 bg-accent text-white rounded-full hover:bg-emerald-600 transition duration-300 shadow-lg">
+        <i class="fas fa-expand"></i>
+      </button>
+      <button id="zoom-in-btn" title="Zoom In" class="px-4 py-2 bg-accent text-white rounded-full hover:bg-emerald-600 transition duration-300 shadow-lg">
+        <i class="fas fa-search-plus"></i>
+      </button>
+      <button class="px-4 py-2 bg-accent text-white rounded-full hover:bg-emerald-600 transition duration-300 shadow-lg"
+        id="saveButton" title="Guardar proyecto">
+        <i class="fas fa-save mr-1"></i>
+      </button>
+      <button class="px-4 py-2 bg-accent text-white rounded-full hover:bg-emerald-600 transition duration-300 shadow-lg"
+        id="exportImageButton" title="Exportar como imagen">
+        <i class="fas fa-image mr-1"></i> 
+      </button>
+      <button class="px-4 py-2 bg-accent text-white rounded-full hover:bg-emerald-600 transition duration-300 shadow-lg"
+        id="downloadJavaButton" title="Exportar a SpringBoot">
+        <i class="fas fa-file-code mr-1"></i> 
+      </button>
+      <button class="px-4 py-2 bg-secondary text-white rounded-full hover:bg-primary transition duration-300 shadow-lg"
+        id="open-ai-modal-btn">
+        <i class="fas fa-magic mr-1"></i> IA
+      </button>
+      <!-- Nuevo botón para iniciar el tour -->
+      <button class="px-4 py-2 bg-gray-500 text-white rounded-full hover:bg-gray-700 transition duration-300 shadow-lg"
+        id="start-tour-btn">
+        <i class="fas fa-question-circle mr-1"></i> Ayuda
+      </button>
+    </div>
+  </div>
+
+  <!-- Canvas para dibujar el diagrama -->
+  <div
+    class="lienzo flex-grow mt-4 w-[95%] md:w-[90%] lg:w-[85%] mx-auto rounded-xl shadow-lg border-2 border-primary overflow-hidden">
+    <canvas id="canvas" class="w-full h-full"></canvas>
+  </div>
+
+  <input id="objetos" type="hidden" value='<%= JSON.stringify(proyecto.objetos) %>'>
+  <input id="pizarra_id" type="hidden" value="<%= pizarra_id %>">
+  <input id="proyecto_name" type="hidden" value="<%= proyecto.name %>">
+
+  <div id="classModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h2>Editar Clase</h2>
+      <label for="className">Nombre de la clase:</label><br>
+      <input type="text" id="className"><br><br>
+      <h3>Atributos</h3>
+      <textarea id="classAttributes" rows="5"
+        placeholder="Ingresa cada atributo en una línea separada"></textarea><br><br>
+      <button id="saveClass">Guardar</button>
+    </div>
+  </div>
+
+  <div id="ai-modal" class="ai-modal">
+    <div class="ai-modal-content">
+      <span class="close-modal-btn" id="close-ai-modal-btn">&times;</span>
+      <h4 class="text-center">✨ Generar con IA</h4>
+      <div class="mt-4">
+        <textarea id="ai-description"
+          class="w-full p-3 rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-secondary transition duration-300 resize-none"
+          placeholder="Ejemplos:
+                • 'Agrega una clase Producto con id:Long, nombre:String, precio:Double'
+                • 'Necesito un ejemplo de sistema de ventas'
+                • 'Genera 3 clases para un sistema bancario'" rows="6">
+        </textarea>
+      </div>
+      <!-- Nueva sección: subir imagen para interpretación -->
+      <div class="mt-4">
+        <label class="block text-sm text-text-gray mb-2">Adjuntar imagen (opcional)</label>
+        <input type="file" id="ai-image-input" accept="image/*" class="w-full text-sm text-text-gray" />
+        <div id="ai-image-preview" class="mt-2">
+          <!-- preview inserted here -->
+        </div>
+        <div id="ai-image-warning" class="text-sm text-danger mt-2 hidden"></div>
+      </div>
+      <button id="generate-with-ai"
+        class="mt-4 w-full py-3 bg-secondary text-white font-bold rounded-lg hover:bg-primary transition duration-300 shadow-md">
+        Enviar
+      </button>
+      <div id="ai-loading" class="mt-4 text-center text-text-gray font-semibold">
+        ⏳ Generando con Gemini AI...
+      </div>
+      <div class="text-sm text-center text-text-gray mt-2">
+        💡 Los nuevos elementos se agregarán al diagrama actual
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
+
+  <script src="/resources/js/UMLClass.js"></script>
+  <script src="/resources/js/UMLRelationship.js"></script>
+  <script src="/resources/js/main.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const openAiBtn = document.getElementById('open-ai-modal-btn');
+      const aiModal = document.getElementById('ai-modal');
+      const closeAiBtn = document.getElementById('close-ai-modal-btn');
+      const canvas = document.getElementById('canvas');
+      const lienzoDiv = document.querySelector('.lienzo');
+      const projectTitle = document.getElementById('project-title');
+
+      // Make project title clickable
+      if (projectTitle) {
+        projectTitle.style.cursor = 'pointer';
+        projectTitle.title = 'Volver a la lista de proyectos';
+        projectTitle.addEventListener('click', () => {
+            window.location.href = '/proyecto';
+        });
+      }
+
+      if (openAiBtn && aiModal && closeAiBtn && canvas && lienzoDiv) {
+        openAiBtn.addEventListener('click', () => {
+          aiModal.style.display = 'flex';
+        });
+
+        closeAiBtn.addEventListener('click', () => {
+          aiModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+          if (event.target === aiModal) {
+            aiModal.style.display = 'none';
+          }
+        });
+
+        function resizeCanvas() {
+          canvas.width = lienzoDiv.clientWidth;
+          canvas.height = lienzoDiv.clientHeight;
+          // Llama a la función de redibujado para restaurar el contenido del canvas
+          if (typeof repaintCanvas === 'function') {
+            repaintCanvas();
+          }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+      } else {
+        console.error('No se encontraron todos los elementos del DOM necesarios.');
+      }
+
+      // Manejo del input de imagen en el modal de IA
+      const imageInput = document.getElementById('ai-image-input');
+      const imagePreview = document.getElementById('ai-image-preview');
+      const imageWarning = document.getElementById('ai-image-warning');
+
+      if (imageInput) {
+        imageInput.addEventListener('change', () => {
+          imagePreview.innerHTML = '';
+          imageWarning.classList.add('hidden');
+
+          const file = imageInput.files[0];
+          if (!file) return;
+
+          // Validar tipo y tamaño (limite 5MB)
+          if (!file.type.startsWith('image/')) {
+            imageWarning.textContent = 'El archivo debe ser una imagen.';
+            imageWarning.classList.remove('hidden');
+            imageInput.value = '';
+            return;
+          }
+          if (file.size > 5 * 1024 * 1024) {
+            imageWarning.textContent = 'La imagen debe ser menor a 5MB.';
+            imageWarning.classList.remove('hidden');
+            imageInput.value = '';
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.maxWidth = '100%';
+            img.style.borderRadius = '6px';
+            imagePreview.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // Improved Driver.js tour
+      const driver = window.driver.js.driver;
+      const tour = driver({
+        showProgress: true,
+        steps: [
+            { element: '#project-title', popover: { title: 'Nombre del Proyecto', description: 'Este es el nombre de tu diagrama. ¡Haz clic aquí para volver a la lista de proyectos!' } },
+            { element: '#canvas', popover: { title: 'Tu Lienzo de Trabajo', description: 'Aquí es donde la magia sucede. Arrastra y suelta elementos para construir tu diagrama de clases.' } },
+            { element: '#tool-select', popover: { title: 'Herramienta de Selección', description: 'Con esta herramienta activada, puedes hacer clic para seleccionar clases, moverlas por el lienzo o hacer doble clic para editar sus atributos.' } },
+            { element: '#tool-class', popover: { title: 'Añadir una Clase', description: 'Haz clic aquí para activar el modo de añadir clase. Luego, haz clic en el lienzo para crear una nueva clase.' } },
+            { element: '#tool-one_to_one', popover: { title: 'Crear Relaciones', description: 'Usa este grupo de botones (1:1, 1:N, N:1, N:N) para dibujar líneas de relación entre tus clases. Simplemente selecciona un tipo de relación y arrastra desde una clase a otra.' } },
+            { element: '#tool-delete', popover: { title: 'Modo Borrador', description: 'Activa esta herramienta para eliminar clases o relaciones con un solo clic. ¡Ten cuidado, no se puede deshacer!' } },
+            { element: '#saveButton', popover: { title: 'Guardar Progreso', description: '¡No pierdas tu trabajo! Usa este botón para guardar el estado actual de tu diagrama en el servidor.' } },
+            { element: '#exportImageButton', popover: { title: 'Exportar como Imagen', description: 'Genera una imagen PNG de tu diagrama para compartirla o usarla en tu documentación.' } },
+            { element: '#downloadJavaButton', popover: { title: 'Generar Código Spring Boot', description: 'Exporta tu diagrama como entidades JPA de Spring Boot. ¡Ahorra tiempo de codificación!' } },
+            { element: '#open-ai-modal-btn', popover: { title: 'Asistente de IA', description: '¿Atascado? Usa la inteligencia artificial para generar clases, atributos o incluso diagramas completos a partir de una descripción o una imagen.' } },
+            { element: '#start-tour-btn', popover: { title: 'Ayuda y Guía', description: 'Puedes volver a ver esta guía en cualquier momento haciendo clic en este botón.' } }
+        ]
+      });
+
+      // Iniciar el tour cuando el usuario hace clic en el botón de ayuda
+      document.getElementById('start-tour-btn').addEventListener('click', () => {
+        tour.drive();
+      });
+    });
+  </script>
+</body>
+
+</html>
